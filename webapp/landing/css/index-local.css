@@ -1,0 +1,245 @@
+@import url(https://allfont.net/allfont.css?fonts=league-spartan);
+
+/* ==================================================================
+2.0 Custom Styles
+================================================================== */
+
+/* 2.1 Font Style Declarations and Other Fixes
+-------------------------------------------------------------- */
+.fontLoaded .sven-container {
+    font-family: 'League Spartan Bold', arial;
+}
+
+body {
+    font-family: 'League Spartan bold', arial;
+}
+
+.sound-info {
+    font-family: 'League Spartan bold', arial;
+
+}
+
+#stomp-intro h1 {
+    -webkit-text-stroke: 0px;
+}
+
+.lt-main {
+    font-weight: normal;
+    font-size: 18px;
+	font-size: 5vw;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+.font2x {
+    font-size: 36px;
+    font-size: 10vw;
+}
+
+.font4x {
+    font-size: 72px;
+    font-size: 20vw;
+}
+
+.splash-page .centered {
+    white-space: normal;
+}
+
+.splash-page .st-btn {
+    margin: 0;
+}
+
+.pl-wrapper { /* Hide Player Controls by default */
+    display: none;
+}
+
+.YTPOverlay, .bv-overlay { /* Hide Video overlays */
+    display: none;
+}
+
+/* 2.2 Font Colors and Backgrounds
+Stamp - #111517, Content BG - #F5F5F5, Headline - #111517,
+Paragraph - #888, Contrast / Highlight(Buttons BG) - #EF0D33
+-------------------------------------------------------------- */
+
+.sk-double-bounce .sk-child /* Preloader Circle Color */
+{
+    background: none #FFF;
+}
+
+.splash-page .btn-fill {
+    background: #FF0808;
+}
+
+/* Teaser Content BG and Text Color */
+.bg-white {
+    background: #FFF;
+}
+
+.bg-white .lt-main {
+    color: #000;
+}
+
+.lt-main.tint-bl {
+    color: #000;
+}
+
+/* Revealer Background */
+.revealer {
+    background: #FF0808;
+}
+
+/* Main Page */
+#intro-content {
+    background-color: #00B7EC;
+    background-image: linear-gradient(315deg, #00B7EC 0%, #1F3A68 74%);
+
+}
+
+#main-content {
+    background-color: #00B7EC;
+    background-image: linear-gradient(315deg, #00B7EC 0%, #1F3A68 74%);
+}
+
+/* Buttons */
+.form-group .btn-bordered {
+    border-color: #FF0808;
+    color: #FF0808;
+}
+
+.form-group .btn-bordered:hover,.form-group .btn-bordered:active, .btn-fill {
+    background: #FF0808;
+    color: #FFF;
+}
+
+.addr-details a:hover {
+    color: #FF0808;
+}
+
+/* Custom Scrollbar */
+.mCSB_scrollTools .mCSB_dragger:active .mCSB_dragger_bar,.mCSB_scrollTools .mCSB_dragger.mCSB_dragger_onDrag .mCSB_dragger_bar,.mCSB_scrollTools .mCSB_dragger:hover .mCSB_dragger_bar {
+    background: #FF0808;
+}
+
+.mCSB_scrollTools .mCSB_draggerRail {
+    background-color: rgba(0,0,0,0.4);
+}
+
+.mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar {
+    background-color: rgba(239, 13, 51,0.75);
+}
+
+.vid-fallback {
+    background-image: url("../resources/particles-fallback.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.sub-bg {
+	background-image: url("../resources/bg-laptop.jpg");
+	background-color: #111517;
+}
+
+#intro-content::before, .splash-page::before {
+    background-image: url("../resources/main-bg.jpg");
+}
+
+.tf-logo {
+    width: 324px;
+}
+
+/* ==================================================================
+3.0 - Responsive Styles
+================================================================== */
+
+/* 3.1 - Small Devices, Tablets (â‰¥768px)
+-------------------------------------------------------------- */
+@media only screen and (min-width : 768px) {
+    .lt-main {
+        font-size: 38px;
+        font-size: 4.5vw;
+    }
+
+    .font2x {
+        font-size: 76px;
+        font-size: 9vw;
+    }
+
+    .font4x {
+        font-size: 152px;
+        font-size: 18vw;
+    }
+}
+
+/* 3.2 - Medium Devices, Desktops (â‰¥992px)
+-------------------------------------------------------------- */
+@media only screen and (min-width : 992px) {
+    .lt-main {
+        font-size: 48px;
+        font-size: 4.5vw;
+    }
+
+    .font2x {
+        font-size: 96px;
+        font-size: 9vw;
+    }
+
+    .font4x {
+        font-size: 192px;
+        font-size: 18vw;
+    }
+}
+
+/* 3.3 - Large Devices, Desktops (â‰¥1200px)
+-------------------------------------------------------------- */
+@media only screen and (min-width : 1200px) {
+    .lt-main {
+        font-size: 64px;
+        font-size: 4.5vw;
+    }
+
+    .font2x {
+        font-size: 128px;
+        font-size: 9vw;
+    }
+
+    .font4x {
+        font-size: 256px;
+        font-size: 18vw;
+    }
+
+    .addr-details {
+        text-align: center;
+    }
+
+    .tf-logo {
+        width: 648px;
+    }
+}
+
+/* 3.4 - Wide Screens, Desktops (â‰¥1824px)
+-------------------------------------------------------------- */
+@media only screen and (min-width : 1824px) {
+    .lt-main {
+        font-size: 92px;
+        font-size: 4.5vw;
+    }
+
+    .font2x {
+        font-size: 184px;
+        font-size: 9vw;
+    }
+
+    .font4x {
+        font-size: 368px;
+        font-size: 18vw;
+    }
+
+    .addr-details {
+        text-align: left;
+    }
+}
