@@ -23,6 +23,7 @@ class defaults
      function __construct()
     {
          $this->accounttypes = array("Basic", "Premium", "VIP");
+         $this->ACCT = array("ALL", "Basic", "Premium", "VIP", "RANDOM");
          $this->codetypes = array("Verification", "Activation", "Recovery");
          $this->actiontypes = array(
              "Action to Login", 
@@ -44,28 +45,31 @@ class defaults
          $this->imagekb = 2000000; //in Bytes
          $this->uploadsuburl = "webapp/"; //Attach link to uploads locals
          $this->gender = array(
-             "Male", "Female"
+             "ALL", "Male", "Female", "RANDOM"
          );
          $this->agerange = array(
+                "ALL",
                 "18 to 24",
                 "25 to 34",
                 "35 to 44",
                 "45 to 54",
                 "55 to 64",
                 "65 to 74",
-                "18 to 74",
+                "RANDOM"
          );
          $this->genotypes = array(
+                "ALL",
                 "AA",
                 "AS",
                 "AC",
                 "SS",
                 "SC",
                 "CC",
+                "RANDOM"
          );
          $this->filter = array(
-            "limit" => 20, 
-            "offset" => 0
+             10,
+             0
             );
          $this->regex = array(
             "/^([\w]{3,})+\s+([\w]{3,})+$/", //0 - name regex
@@ -75,7 +79,9 @@ class defaults
          $this->actions = array(
            "login", //0 - Sign in user
            "checkUsernameExist", //1 - Check if username exist
-           "updatematches"  //2 - Update or Get User Matches
+           "updateMatches",  //2 - Update or Get User Matches
+           "performYUP", //3 - Perform yup Request
+           "performGift", //4 - Perform Gifting Request
          );
     }
     public function getActions(){
@@ -108,6 +114,10 @@ class defaults
     
     public function getRemoveFromGalleryActionKey(){
         return 2;
+    }
+    
+    public function getACCTTypes(){
+        return $this->ACCT;
     }
     
     public function getNormal(){

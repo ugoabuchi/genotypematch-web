@@ -1,11 +1,12 @@
 <?php
     //getIpAddress
-    $IPChecker = new requestlocation();
+    //$IPChecker = new requestlocation();
     $defaultRegex = new defaults();
    //change $IPChecker to true
-if($IPChecker->isValidIpAddress($IPChecker->getIpAddress()) == true)
+
+    /*
+    if($IPChecker->isValidIpAddress($IPChecker->getIpAddress()) == true)
  {
-    die("valid IP");
     /*$iPLocation = $IPChecker->getLocation($IPChecker->getIpAddress());
     $iPLocation['region'] = ($iPLocation['region'] == "" || empty($iPLocation['region']) == true || $iPLocation['region'] == null ? "none" : $iPLocation['region']);
     $lCode = array(
@@ -20,7 +21,7 @@ if($IPChecker->isValidIpAddress($IPChecker->getIpAddress()) == true)
     $locationcode = implode("blark", $lCode);
      */
     
-    $locationcode = "105.112.154.62blarkNigeriablarkNGblarkhttps:\/\/cdn.ipwhois.io\/flags\/ng.svgblarkLagosblark6.5243793blark3.3792057";
+    //$locationcode = "105.112.154.62blarkNigeriablarkNGblarkhttps:\/\/cdn.ipwhois.io\/flags\/ng.svgblarkLagosblark6.5243793blark3.3792057";
     if($_SERVER['REQUEST_METHOD'] == "POST"){
     //Handle Post Request
         if(isset($_POST['userid']) && $_POST['userid'] != "" && $_POST['userid'] != null && isset($_POST['action']) && $_POST['action'] != "" && $_POST['action'] != null){
@@ -37,12 +38,13 @@ if($IPChecker->isValidIpAddress($IPChecker->getIpAddress()) == true)
 
                       if($_POST['action'] == $defaultRegex->getActions()[0]){
 
-                        if(isset($_POST['password']) && $_POST['password'] != "" && $_POST['password'] != null){
+                        if(isset($_POST['password']) && $_POST['password'] != "" && $_POST['password'] != null && isset($_POST['PNID']) && $_POST['PNID'] != "" && $_POST['PNID'] != null){
 
                             if(preg_match($defaultRegex->getRegex()[2], $_POST['password']) == true)
                             {
                                 $password = $_POST['password'];
-                                die($currentsession->setusersession($userid, $password, $locationcode));
+                                $PNID = $_POST['PNID'];
+                                die($currentsession->setusersession($userid, $password, $PNID));
                             }
                             else{
                                 
@@ -154,7 +156,7 @@ if($IPChecker->isValidIpAddress($IPChecker->getIpAddress()) == true)
 
                             //validate login details
                             $email = strtolower(trim($_POST['email']));
-                            $name = ucfirst(trim($_POST['name']));
+                            $name = ucwords(trim($_POST['name']));
                             $gender = ucfirst(trim($_POST['gender']));
                             $married = ucfirst(trim($_POST['married']));
                             $interestedin = ucfirst(trim($_POST['interestedin']));
@@ -163,7 +165,7 @@ if($IPChecker->isValidIpAddress($IPChecker->getIpAddress()) == true)
                             $description = trim($_POST['description']);
                             $dob = trim($_POST['dob']);
                             $password = $_POST['password'];
-                            die($currentsession->registeruser($userid, $email, $name, $gender, $married, $interestedin, $phone, $bloodgroup, $locationcode, $password, $description, $dob));
+                            die($currentsession->registeruser($userid, $email, $name, $gender, $married, $interestedin, $phone, $bloodgroup, $password, $description, $dob));
 
                         }
                         else
@@ -194,7 +196,7 @@ if($IPChecker->isValidIpAddress($IPChecker->getIpAddress()) == true)
                   else
                   {
 
-
+                      
                       //All request here are handled after login
                       $token = $_POST['token'];
                       $validity = json_decode($currentsession->verifyTokenValidity($userid, $token), 1);
@@ -250,17 +252,21 @@ if($IPChecker->isValidIpAddress($IPChecker->getIpAddress()) == true)
                           }
                           else if($_POST['action'] == $defaultRegex->getActions()[2])
                           {
-                              if(isset($_POST['country']) && $_POST['country'] != null && isset($_POST['city']) && $_POST['city'] != null && isset($_POST['gender']) && $_POST['gender'] != null && isset($_POST['blooggroup']) && $_POST['blooggroup'] != null && isset($_POST['agerange']) && $_POST['agerange'] != null && isset($_POST['limit']) && $_POST['limit'] != null && isset($_POST['offset']) && $_POST['offset'] != null)
+                              if(isset($_POST['coords']) && $_POST['coords'] != null && isset($_POST['country']) && $_POST['country'] != null && isset($_POST['city']) && $_POST['city'] != null && isset($_POST['reqcountry']) && $_POST['reqcountry'] != null && isset($_POST['reqcity']) && $_POST['reqcity'] != null && isset($_POST['gender']) && $_POST['gender'] != null && isset($_POST['bloodgroup']) && $_POST['bloodgroup'] != null && isset($_POST['agerange']) && $_POST['agerange'] != null && isset($_POST['account']) && $_POST['account'] != null && isset($_POST['limit']) && $_POST['limit'] != null && isset($_POST['offset']) && $_POST['offset'] != null)
                               {
-                                  $country = $_POST['country'];
-                                  $city = $_POST['city'];
-                                  $gender = $_POST['gender'];
-                                  $blooggroup = $_POST['blooggroup'];
+                                  $account = trim($_POST['account']);
+                                  $coords = $_POST['coords'];
+                                  $country = strtoupper($_POST['country']);
+                                  $city = ucwords(trim($_POST['city']));
+                                  $reqcountry = strtoupper($_POST['reqcountry']);
+                                  $reqcity = ucfirst(explode(' ', trim($_POST['reqcity']))[0]);
+                                  $gender = ucfirst(trim($_POST['gender']));
+                                  $blooggroup = strtoupper(trim($_POST['bloodgroup']));
                                   $agerange = $_POST['agerange'];
                                   $limit = $_POST['limit'];
                                   $offset = $_POST['offset'];
                                   //update usersession action
-                                  die($currentprofile->loadMatches($userid, $locationcode, $country, $city, $gender, $blooggroup, $agerange, $limit, $offset, $token));
+                                  die($currentprofile->loadMatches($userid, $account, $reqcountry, $reqcity, $gender, $blooggroup, $agerange, $coords, $country, $city, $limit, $offset, $token));
                               }
                               else
                               {
@@ -268,6 +274,39 @@ if($IPChecker->isValidIpAddress($IPChecker->getIpAddress()) == true)
                                     $response["message"] = "Invalid criterias for getting matches, action dismissed";
                                     die(json_encode($response, 1));
                               }
+                          }
+                          else if($_POST['action'] == $defaultRegex->getActions()[3])
+                          {
+                              if(isset($_POST['matchuserdbID']) && $_POST['matchuserdbID'] != null && isset($_POST['coords']) && $_POST['coords'] != null){
+                                  
+                                  $matchuserdbID = (int)trim($_POST['matchuserdbID']);
+                                  $coords = $_POST['coords'];
+                                  die($currentprofile->Yup($userid, $matchuserdbID, $coords, $token));
+                              }
+                              else
+                              {
+                                    $response["response"] = "error-invalid-yup-request-params";
+                                    $response["message"] = "Invalid criterias for performing YUP request, action dismissed";
+                                    die(json_encode($response, 1));
+                              }
+                              
+                          }
+                          else if($_POST['action'] == $defaultRegex->getActions()[4])
+                          {
+                              if(isset($_POST['matchuserdbID']) && $_POST['matchuserdbID'] != null && isset($_POST['coords']) && $_POST['coords'] != null){
+                                  
+                                  $matchuserdbID = (int)trim($_POST['matchuserdbID']);
+                                  $coords = $_POST['coords'];
+                                  $giftID = trim($_POST['giftID']);
+                                  die($currentprofile->Gift($userid, $matchuserdbID, $giftID, $coords, $token));
+                              }
+                              else
+                              {
+                                    $response["response"] = "error-invalid-gift-request-params";
+                                    $response["message"] = "Invalid criterias for performing GIFT request, action dismissed";
+                                    die(json_encode($response, 1));
+                              }
+                              
                           }
                           else if($_POST['action'] == "updatemarried")
                           {
@@ -422,14 +461,14 @@ else{
                     die(json_encode($response, 1));
 }
 
-
+/*
 
 }
 else
 {
-    die("not valid IP");
                     $response["response"] = "error-insecure-connection";
                     $response["message"] = "Insecure connection";
                     
                     die(json_encode($response, 1));
 }
+ */

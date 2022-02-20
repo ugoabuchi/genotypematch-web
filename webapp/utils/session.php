@@ -27,7 +27,7 @@ class session
     }
     
     
-    public function registeruser($userid, $email, $name, $gender, $married, $interestedin, $phone, $bloodgroup, $locationcode, $password, $description, $dob)
+    public function registeruser($userid, $email, $name, $gender, $married, $interestedin, $phone, $bloodgroup, $password, $description, $dob)
     {
          //check if users table exist
                 if($this->sessiondb->execute_count_table_no_return("users") == 0)
@@ -43,7 +43,9 @@ class session
                         `interestedin` VARCHAR(160) NOT NULL ,
                         `phone` VARCHAR(160) NOT NULL ,
                         `blooggroup` VARCHAR(160) NOT NULL ,
-                        `locationcode` VARCHAR(160) NOT NULL ,
+                        `lastseencountry` VARCHAR(160) NOT NULL ,
+                        `lastseencity` VARCHAR(160) NOT NULL ,
+                        `lastseencoords` VARCHAR(160) NOT NULL ,
                         `accounttype` VARCHAR(160) NOT NULL ,
                         `gc` VARCHAR(160) NOT NULL ,
                         `verified` VARCHAR(160) NOT NULL ,
@@ -55,6 +57,7 @@ class session
                         `pverified` VARCHAR(160) NOT NULL ,
                         `bverified` VARCHAR(160) NOT NULL ,
                         `passkey` VARCHAR(160) NOT NULL,
+                        `PNID` VARCHAR(160) NOT NULL,
                         `salt` VARCHAR(160) NOT NULL,
                         `created` VARCHAR(160) NOT NULL,
                         PRIMARY KEY (`id`), 
@@ -102,7 +105,7 @@ class session
                     $accounttype = $this->defaults->getNormal();
                     //register new user
                     $generatedPasskey = md5($password)."-blark-".md5((md5("-blark-").$salt)).md5($password);
-                    $sqs = "INSERT INTO `users`(`username`, `email`, `name`, `gender`,`married`, `interestedin`, `phone`, `blooggroup`, `locationcode`, `accounttype`, `gc`, `verified`, `enabled`, `ltimein`, `description`,`dob`, `token`,`pverified`, `bverified`, `passkey`, `salt`, `created`) VALUES ('$userid', '$email', '$name', '$gender','$married', '$interestedin', '$phone', '$bloodgroup', '$locationcode', '$accounttype', '$newuserdefaultgc', 'true', 'true', '', '$description', '$dob', '', 'true', 'false', '$generatedPasskey', '$salt', now())";
+                    $sqs = "INSERT INTO `users`(`username`, `email`, `name`, `gender`,`married`, `interestedin`, `phone`, `blooggroup`, `lastseencountry`, `lastseencity`, `lastseencoords`, `accounttype`, `gc`, `verified`, `enabled`, `ltimein`, `description`,`dob`, `token`,`pverified`, `bverified`, `passkey`, `PNID`, `salt`, `created`) VALUES ('$userid', '$email', '$name', '$gender','$married', '$interestedin', '$phone', '$bloodgroup', '', '', '', '$accounttype', '$newuserdefaultgc', 'true', 'true', '', '$description', '$dob', '', 'true', 'false', '$generatedPasskey', '',  '$salt', now())";
                     $this->sessiondb->execute_no_return($sqs);
                     $this->response["response"] = "success";
                     $this->response["message"] = "Your registration was successful";
@@ -144,7 +147,9 @@ class session
                         `interestedin` VARCHAR(160) NOT NULL ,
                         `phone` VARCHAR(160) NOT NULL ,
                         `blooggroup` VARCHAR(160) NOT NULL ,
-                        `locationcode` VARCHAR(160) NOT NULL ,
+                        `lastseencountry` VARCHAR(160) NOT NULL ,
+                        `lastseencity` VARCHAR(160) NOT NULL ,
+                        `lastseencoords` VARCHAR(160) NOT NULL ,
                         `accounttype` VARCHAR(160) NOT NULL ,
                         `gc` VARCHAR(160) NOT NULL ,
                         `verified` VARCHAR(160) NOT NULL ,
@@ -156,6 +161,7 @@ class session
                         `pverified` VARCHAR(160) NOT NULL ,
                         `bverified` VARCHAR(160) NOT NULL ,
                         `passkey` VARCHAR(160) NOT NULL,
+                        `PNID` VARCHAR(160) NOT NULL,
                         `salt` VARCHAR(160) NOT NULL,
                         `created` VARCHAR(160) NOT NULL,
                         PRIMARY KEY (`id`), 
@@ -185,9 +191,8 @@ class session
     }
 
 
-    public function setusersession($userid, $password,  $locationcode)
+    public function setusersession($userid, $password, $PNID)
     {
-        
          //check if users table exist
                 if($this->sessiondb->execute_count_table_no_return("users") == 0)
                 {   
@@ -202,7 +207,9 @@ class session
                         `interestedin` VARCHAR(160) NOT NULL ,
                         `phone` VARCHAR(160) NOT NULL ,
                         `blooggroup` VARCHAR(160) NOT NULL ,
-                        `locationcode` VARCHAR(160) NOT NULL ,
+                        `lastseencountry` VARCHAR(160) NOT NULL ,
+                        `lastseencity` VARCHAR(160) NOT NULL ,
+                        `lastseencoords` VARCHAR(160) NOT NULL ,
                         `accounttype` VARCHAR(160) NOT NULL ,
                         `gc` VARCHAR(160) NOT NULL ,
                         `verified` VARCHAR(160) NOT NULL ,
@@ -214,6 +221,7 @@ class session
                         `pverified` VARCHAR(160) NOT NULL ,
                         `bverified` VARCHAR(160) NOT NULL ,
                         `passkey` VARCHAR(160) NOT NULL,
+                        `PNID` VARCHAR(160) NOT NULL,
                         `salt` VARCHAR(160) NOT NULL,
                         `created` VARCHAR(160) NOT NULL,
                         PRIMARY KEY (`id`), 
@@ -231,7 +239,7 @@ class session
                         `taction` VARCHAR(160) NOT NULL , 
                         `token` TEXT NOT NULL ,
                         `created` VARCHAR(160) NOT NULL ,
-                        `locationcode` VARCHAR(160) NOT NULL ,
+                        `lastseencoords` VARCHAR(160) NOT NULL ,
                         `validity` VARCHAR(160) NOT NULL , 
                         PRIMARY KEY (`id`)) ENGINE = InnoDB;";
                     $this->sessiondb->execute_no_return($tablequery);
@@ -256,7 +264,7 @@ class session
                 
  
             //check if user exist in users table
-            $sql = "SELECT `id`, `username`, `email`, `name`, `gender`, `married`, `interestedin`, `phone`, `blooggroup`, `description`,`dob`, `locationcode`, `token`, `accounttype`, `gc`, `verified`, `enabled`, `ltimein`, `pverified`, `bverified`, `passkey`, `salt`  FROM `users` WHERE username='$userid'";
+            $sql = "SELECT `id`, `username`, `email`, `name`, `gender`, `married`, `interestedin`, `phone`, `blooggroup`, `description`,`dob`,`token`, `accounttype`, `gc`, `verified`, `enabled`, `ltimein`, `pverified`, `bverified`, `passkey`, `salt`  FROM `users` WHERE username='$userid'";
             if(count($this->sessiondb->execute_return($sql)) < 1)
             {
                 //User does not exist
@@ -292,9 +300,9 @@ class session
                     $this->deleteLoginSession($dbuserid);
                     $tcode = $this->token->getToken();
                      //update login token and ltimein
-                    $upsql = "UPDATE `users` SET `token`='$tcode', `locationcode`='$locationcode', `ltimein`=now()  WHERE email='$email'";
+                    $upsql = "UPDATE `users` SET `token`='$tcode', `lastseencoords`='', `ltimein`=now(), `PNID`='$PNID'  WHERE email='$email'";
                     $this->sessiondb->execute_no_return($upsql);
-                    $this->updateusersessionaction($dbuserid, $tcode, $this->defaults->getActionType()[0], $locationcode);
+                    $this->updateusersessionaction($dbuserid, $tcode, $this->defaults->getActionType()[0], '');
                     
                     $dbvalues = $this->sessiondb->execute_return($sql)[0];
                     $picturesql = "SELECT title, ext FROM gallery WHERE userid='$dbuserid' AND type='Image' AND isprofilepicture='true'";
@@ -319,7 +327,6 @@ class session
                     {
                         $dbvalues['gallery'] = array();
                     }
-                    $dbvalues['permissions'] = array("location"=>"", "camera"=>"");
                     unset($dbvalues['salt']);
                     unset($dbvalues['id']);
                     unset($dbvalues['passkey']);
@@ -419,7 +426,9 @@ class session
                         `interestedin` VARCHAR(160) NOT NULL ,
                         `phone` VARCHAR(160) NOT NULL ,
                         `blooggroup` VARCHAR(160) NOT NULL ,
-                        `locationcode` VARCHAR(160) NOT NULL ,
+                        `lastseencountry` VARCHAR(160) NOT NULL ,
+                        `lastseencity` VARCHAR(160) NOT NULL ,
+                        `lastseencoords` VARCHAR(160) NOT NULL ,
                         `accounttype` VARCHAR(160) NOT NULL ,
                         `gc` VARCHAR(160) NOT NULL ,
                         `verified` VARCHAR(160) NOT NULL ,
@@ -431,6 +440,7 @@ class session
                         `pverified` VARCHAR(160) NOT NULL ,
                         `bverified` VARCHAR(160) NOT NULL ,
                         `passkey` VARCHAR(160) NOT NULL,
+                        `PNID` VARCHAR(160) NOT NULL,
                         `salt` VARCHAR(160) NOT NULL,
                         `created` VARCHAR(160) NOT NULL,
                         PRIMARY KEY (`id`), 
@@ -700,7 +710,7 @@ class session
             
     }
     
-    public function updateusersessionaction($dbuserid, $token, $action, $locationcode){
+    public function updateusersessionaction($dbuserid, $token, $action, $lastseencoords){
         if($this->sessiondb->execute_count_table_no_return("usersession") == 0)
                 {
                     $tablequery = "
@@ -710,12 +720,12 @@ class session
                         `taction` VARCHAR(160) NOT NULL , 
                         `token` TEXT NOT NULL ,
                         `created` VARCHAR(160) NOT NULL ,
-                        `locationcode` VARCHAR(160) NOT NULL ,
+                        `lastseencoords` VARCHAR(160) NOT NULL ,
                         `validity` VARCHAR(160) NOT NULL , 
                         PRIMARY KEY (`id`)) ENGINE = InnoDB;";
                     $this->sessiondb->execute_no_return($tablequery);
                 }
-        $sqs = "INSERT INTO usersession (userid, taction, token, created, locationcode, validity) VALUES('$dbuserid', '$action', '$token', now(), '$locationcode', 'true')";
+        $sqs = "INSERT INTO usersession (userid, taction, token, created, lastseencoords, validity) VALUES('$dbuserid', '$action', '$token', now(), '$lastseencoords', 'true')";
         $this->sessiondb->execute_no_return($sqs); 
     }
     
@@ -765,7 +775,7 @@ class session
                         `taction` VARCHAR(160) NOT NULL , 
                         `token` TEXT NOT NULL ,
                         `created` VARCHAR(160) NOT NULL ,
-                        `locationcode` VARCHAR(160) NOT NULL ,
+                        `lastseencoords` VARCHAR(160) NOT NULL ,
                         `validity` VARCHAR(160) NOT NULL , 
                         PRIMARY KEY (`id`)) ENGINE = InnoDB;";
                     $this->sessiondb->execute_no_return($tablequery);

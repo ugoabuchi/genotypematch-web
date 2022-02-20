@@ -127,17 +127,19 @@ class database {
                     return 0;
                 }
     }
-    function execute_unique_id_return($table_name, $table_create_dsql)
+    function execute_unique_id_return($table_name)
     {
-        //check if table exist, else create table from supplied table sql
-       if($this->execute_count_table_no_return($table_name) == 0)
-       {
-        $this->execute_no_return($table_create_dsql);
-       } 
-
-       $last_index = $this->execute_count_return("SELECT COUNT(*) FROM `'$table_name'` WHERE 1");
+        //check if table exist, else create table from supplied table sql, make sure your tabled contains column 'id'
        $unique_val = md5(uniqid()).md5(random_int(100, random_int(1000, 50000000)));
-       return $unique_val."".$last_index;
+       $last_index = $this->execute_return("SELECT * FROM `".$table_name."` ORDER BY id DESC LIMIT 1");
+       if(is_array($last_index) && count($last_index) > 0)
+       {
+           return $unique_val."".$last_index[0]['id'];
+       }
+       else
+       {
+           return $unique_val;
+       }
 
     }
 
