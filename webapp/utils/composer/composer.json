@@ -1,6 +1,7 @@
 {
     "require": {
         "phpmailer/phpmailer": "^6.5",
-        "spatie/async": "^1.5"
+        "spatie/async": "^1.5",
+        "alymosul/exponent-server-sdk-php": "^1.3"
     }
 }

@@ -11,4 +11,5 @@ return array(
     'Spatie\\Async\\' => array($vendorDir . '/spatie/async/src'),
     'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
     'Opis\\Closure\\' => array($vendorDir . '/opis/closure/src'),
+    'ExponentPhpSDK\\' => array($vendorDir . '/alymosul/exponent-server-sdk-php/lib'),
 );

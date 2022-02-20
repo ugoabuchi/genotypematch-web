@@ -1,22 +1,31 @@
 <?php return array(
     'root' => array(
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => NULL,
+        'reference' => 'b33c15d6fadcbbca6086806d8876c43ffeb4845e',
         'name' => '__root__',
         'dev' => true,
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => NULL,
+            'reference' => 'b33c15d6fadcbbca6086806d8876c43ffeb4845e',
+            'dev_requirement' => false,
+        ),
+        'alymosul/exponent-server-sdk-php' => array(
+            'pretty_version' => '1.3.0',
+            'version' => '1.3.0.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../alymosul/exponent-server-sdk-php',
+            'aliases' => array(),
+            'reference' => '81e263c5f0b306f19da4acea7aa217b796626fff',
             'dev_requirement' => false,
         ),
         'opis/closure' => array(

@@ -1,6 +1,57 @@
 {
     "packages": [
         {
+            "name": "alymosul/exponent-server-sdk-php",
+            "version": "1.3.0",
+            "version_normalized": "1.3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Alymosul/exponent-server-sdk-php.git",
+                "reference": "81e263c5f0b306f19da4acea7aa217b796626fff"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Alymosul/exponent-server-sdk-php/zipball/81e263c5f0b306f19da4acea7aa217b796626fff",
+                "reference": "81e263c5f0b306f19da4acea7aa217b796626fff",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "php": ">=7.0"
+            },
+            "time": "2021-06-22T13:15:22+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "ExponentPhpSDK\\": "lib"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Aly Suleiman",
+                    "email": "alymosul@gmail.com"
+                }
+            ],
+            "description": "Server-side library for working with Expo push notifications using PHP",
+            "keywords": [
+                "expo",
+                "exponent",
+                "notifications",
+                "push"
+            ],
+            "support": {
+                "issues": "https://github.com/Alymosul/exponent-server-sdk-php/issues",
+                "source": "https://github.com/Alymosul/exponent-server-sdk-php/tree/1.3.0"
+            },
+            "install-path": "../alymosul/exponent-server-sdk-php"
+        },
+        {
             "name": "opis/closure",
             "version": "3.6.2",
             "version_normalized": "3.6.2.0",

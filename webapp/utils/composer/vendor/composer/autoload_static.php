@@ -27,6 +27,10 @@ class ComposerStaticInit472add47eee79ab07180c52fb4bd1260
         array (
             'Opis\\Closure\\' => 13,
         ),
+        'E' => 
+        array (
+            'ExponentPhpSDK\\' => 15,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -49,6 +53,10 @@ class ComposerStaticInit472add47eee79ab07180c52fb4bd1260
         'Opis\\Closure\\' => 
         array (
             0 => __DIR__ . '/..' . '/opis/closure/src',
+        ),
+        'ExponentPhpSDK\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/alymosul/exponent-server-sdk-php/lib',
         ),
     );
 

@@ -9,24 +9,23 @@ class logwriter
 
     public function log($uri, $logtext)
     {
-        //check if file exist, if not create one
-        if(!file_exists($uri))
+        
+        //make sure empty log id not recieved
+        $message = trim($logtext);
+        if($message != "" && $message != null && !empty($message))
         {
-            $fp = fopen($uri,'W');
+            //save new log
+            $fp = fopen($uri,'a');
+            fwrite($fp,$message."\n");
             fclose($fp);
         }
-
-        //save new log
-        $fp = fopen($uri,'a');
-        fwrite($fp,$logtext."\n");
-        fclose($fp);
     } 
 
     //delete log
     public function deletelog($uri, $logtext)
     {
         //check if file exist before attempting delete
-        if(!file_exists($uri))
+        if(file_exists($uri))
         {
             unlink($uri);
         }
