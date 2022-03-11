@@ -550,7 +550,7 @@ class profile
                 $randsql = "ORDER BY RAND()";
                 $limitsql = ("LIMIT ".$limit);
                 $offsetsql = ("OFFSET ".$offset);
-                $matchsql = "SELECT `id`, `username`, `name`, `lastseencountry`, `lastseencity`, `lastseencoords`, `gender`, `blooggroup`, `accounttype`, `description`, `pverified`, `bverified`, `dob` FROM `users` WHERE ".$removemainuserfrommatch." AND ".$countryconcatsql." AND ".$cityconcatsql." AND ".$accountconcatsql." AND ".$genderconcatsql." AND ".$blooggroupconcatsql." AND ".$ageconcatsql." ".$randsql." ".$limitsql." ".$offsetsql;
+                $matchsql = "SELECT `id`, `username`, `name`, `lastseencountry`, `lastseencity`, `lastseencoords`, `gender`, `blooggroup`, `accounttype`, `description`, `pverified`, `bverified`, `dob` FROM `users` WHERE PNID != '' AND ".$removemainuserfrommatch." AND ".$countryconcatsql." AND ".$cityconcatsql." AND ".$accountconcatsql." AND ".$genderconcatsql." AND ".$blooggroupconcatsql." AND ".$ageconcatsql." ".$randsql." ".$limitsql." ".$offsetsql;
                 
                 //perform query
                 $matchData = $this->sessiondb->execute_return($matchsql);
@@ -660,7 +660,7 @@ class profile
                 $randsql = "ORDER BY RAND()";
                 $limitsql = ("LIMIT ".$limit);
                 $offsetsql = ("OFFSET ".$offset);
-                $matchsql = "SELECT `id`, `username`, `name`, `lastseencountry`, `lastseencity`, `lastseencoords`, `gender`, `blooggroup`, `accounttype`, `description`, `pverified`, `bverified`, `dob` FROM `users` WHERE ".$removemainuserfrommatch." AND ".$countryconcatsql." AND ".$cityconcatsql." AND ".$accountconcatsql." AND ".$genderconcatsql." AND ".$blooggroupconcatsql." AND ".$ageconcatsql." ".$randsql." ".$limitsql." ".$offsetsql;
+                $matchsql = "SELECT `id`, `username`, `name`, `lastseencountry`, `lastseencity`, `lastseencoords`, `gender`, `blooggroup`, `accounttype`, `description`, `pverified`, `bverified`, `dob` FROM `users` WHERE PNID != '' AND ".$removemainuserfrommatch." AND ".$countryconcatsql." AND ".$cityconcatsql." AND ".$accountconcatsql." AND ".$genderconcatsql." AND ".$blooggroupconcatsql." AND ".$ageconcatsql." ".$randsql." ".$limitsql." ".$offsetsql;
                 
                 //perform query
                 $matchData = $this->sessiondb->execute_return($matchsql);
@@ -754,7 +754,7 @@ class profile
                 $randsql = "ORDER BY RAND()";
                 $limitsql = ("LIMIT ".$limit);
                 $offsetsql = ("OFFSET ".$offset);
-                $matchsql = "SELECT `id`, `username`, `name`, `lastseencountry`, `lastseencity`, `lastseencoords`, `gender`, `blooggroup`, `accounttype`, `description`, `pverified`, `bverified`, `dob` FROM `users` WHERE ".$removemainuserfrommatch." AND ".$countryconcatsql." AND ".$cityconcatsql." AND ".$accountconcatsql." AND ".$genderconcatsql." AND ".$blooggroupconcatsql." AND ".$ageconcatsql." ".$randsql." ".$limitsql." ".$offsetsql;
+                $matchsql = "SELECT `id`, `username`, `name`, `lastseencountry`, `lastseencity`, `lastseencoords`, `gender`, `blooggroup`, `accounttype`, `description`, `pverified`, `bverified`, `dob` FROM `users` WHERE PNID != '' AND ".$removemainuserfrommatch." AND ".$countryconcatsql." AND ".$cityconcatsql." AND ".$accountconcatsql." AND ".$genderconcatsql." AND ".$blooggroupconcatsql." AND ".$ageconcatsql." ".$randsql." ".$limitsql." ".$offsetsql;
                 
                 //perform query
                 $matchData = $this->sessiondb->execute_return($matchsql);
@@ -877,11 +877,14 @@ class profile
     public function sendNotification($MACTHDBID, $USERDBID, $responseTag,  $notificationtype = 0){
         /*
             0 -> General Notification
-            1 -> Like Notification
+            1 -> YUP Notification
             2 -> Match Notification
             3 -> Gift Notification
-            4 -> Like Error Notification
+            4 -> YUP Error Notification
             5 -> Gift Error Notification
+            6 -> Message Notification
+            7 -> Message Error Notification
+            8 -> Admin Notification
 
         */
 

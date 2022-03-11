@@ -24,12 +24,44 @@ class session
         $this->sendmail = new mailmanager("genotypematch.com", 465, "devop@genotypematch.com", "blark2018@");
         $this->response = [];
         $this->pool = Pool::create();
-    }
-    
-    
-    public function registeruser($userid, $email, $name, $gender, $married, $interestedin, $phone, $bloodgroup, $password, $description, $dob)
-    {
-         //check if users table exist
+        
+        
+        //create all needed table if they dont exist
+        
+        //check if useremailalerts table exist
+                if($this->sessiondb->execute_count_table_no_return("useremailalerts") == 0)
+                {
+                    $tablequery = "
+                    CREATE TABLE `useremailalerts` ( 
+                        `id` INT(16) NOT NULL AUTO_INCREMENT , 
+                        `recieveruserid` VARCHAR(160) NOT NULL , 
+                        `type` VARCHAR(160) NOT NULL , 
+                        `message` VARCHAR(160) NOT NULL ,
+                        `attachmenturi` VARCHAR(160) NOT NULL ,
+                        `sent` VARCHAR(160) NOT NULL ,
+                        `timestamp` VARCHAR(160) NOT NULL ,
+                        PRIMARY KEY (`id`), 
+                        UNIQUE (`userid`)) ENGINE = InnoDB;";
+                    $this->sessiondb->execute_no_return($tablequery);
+                }
+                
+                //check if userphonealerts table exist
+                if($this->sessiondb->execute_count_table_no_return("userphonealerts") == 0)
+                {
+                    $tablequery = "
+                    CREATE TABLE `userphonealerts` ( 
+                        `id` INT(16) NOT NULL AUTO_INCREMENT , 
+                        `recieveruserid` VARCHAR(160) NOT NULL , 
+                        `type` VARCHAR(160) NOT NULL , 
+                        `message` VARCHAR(160) NOT NULL ,
+                        `sent` VARCHAR(160) NOT NULL ,
+                        `timestamp` VARCHAR(160) NOT NULL ,
+                        PRIMARY KEY (`id`), 
+                        UNIQUE (`userid`)) ENGINE = InnoDB;";
+                    $this->sessiondb->execute_no_return($tablequery);
+                }
+                
+                //check if users table exist
                 if($this->sessiondb->execute_count_table_no_return("users") == 0)
                 {   
                     $tablequery = "
@@ -66,7 +98,78 @@ class session
                 }
                 
  
-          
+                //check if usersnotificationsettings table exist
+                if($this->sessiondb->execute_count_table_no_return("usersnotificationsettings") == 0)
+                {
+                    $tablequery = "
+                    CREATE TABLE `usersnotificationsettings` ( 
+                        `id` INT(16) NOT NULL AUTO_INCREMENT , 
+                        `userid` VARCHAR(160) NOT NULL , 
+                        `general` VARCHAR(160) NOT NULL , 
+                        `admin` VARCHAR(160) NOT NULL ,
+                        `messages` VARCHAR(160) NOT NULL ,
+                        `YUP` VARCHAR(160) NOT NULL ,
+                        `gift` VARCHAR(160) NOT NULL ,
+                        `YUPError` VARCHAR(160) NOT NULL ,
+                        `giftError` VARCHAR(160) NOT NULL ,
+                        `messageError` VARCHAR(160) NOT NULL ,
+                        `matchGN` VARCHAR(160) NOT NULL ,
+                        PRIMARY KEY (`id`), 
+                        UNIQUE (`userid`)) ENGINE = InnoDB;";
+                    $this->sessiondb->execute_no_return($tablequery);
+                }
+                
+                 //check if usersession table exist
+                if($this->sessiondb->execute_count_table_no_return("usersession") == 0)
+                {
+                    $tablequery = "
+                    CREATE TABLE `usersession` ( 
+                        `id` INT(16) NOT NULL AUTO_INCREMENT , 
+                        `userid` VARCHAR(160) NOT NULL , 
+                        `taction` VARCHAR(160) NOT NULL , 
+                        `token` TEXT NOT NULL ,
+                        `created` VARCHAR(160) NOT NULL ,
+                        `lastseencoords` VARCHAR(160) NOT NULL ,
+                        `validity` VARCHAR(160) NOT NULL , 
+                        PRIMARY KEY (`id`)) ENGINE = InnoDB;";
+                    $this->sessiondb->execute_no_return($tablequery);
+                }
+                
+                //check if gallery table exist
+                 if($this->sessiondb->execute_count_table_no_return("gallery") == 0)
+                {
+                    $tablequery = "
+                    CREATE TABLE `gallery` ( 
+                        `id` INT(16) NOT NULL AUTO_INCREMENT , 
+                        `userid` VARCHAR(160) NOT NULL ,
+                        `title` VARCHAR(160) NOT NULL ,
+                        `type` VARCHAR(160) NOT NULL ,
+                        `ext` TEXT NOT NULL ,
+                        `isprofilepicture` VARCHAR(160) NOT NULL ,
+                        `uploaded` VARCHAR(160) NOT NULL , 
+                        PRIMARY KEY (`id`),
+                        UNIQUE (`title`)) ENGINE = InnoDB;";
+                    $this->sessiondb->execute_no_return($tablequery);
+                }
+                
+                //check if codes table exist
+                if($this->sessiondb->execute_count_table_no_return("codes") == 0)
+                {
+                    $tablequery = "
+                    CREATE TABLE `codes` ( 
+                        `id` INT(16) NOT NULL AUTO_INCREMENT , 
+                        `userid` VARCHAR(160) NOT NULL , 
+                        `action` VARCHAR(160) NOT NULL , 
+                        `code` VARCHAR(160) NOT NULL ,
+                        `created` VARCHAR(160) NOT NULL ,
+                        PRIMARY KEY (`id`)) ENGINE = InnoDB;";
+                    $this->sessiondb->execute_no_return($tablequery);
+                } 
+    }
+    
+    
+    public function registeruser($userid, $email, $name, $gender, $married, $interestedin, $phone, $bloodgroup, $password, $description, $dob)
+    {
             //check if user exist in users table
             $useridsql = "SELECT COUNT(*) FROM `users` WHERE username='$userid'";
             $emailcheck = "SELECT COUNT(*) FROM `users` WHERE email='$email'";
@@ -105,11 +208,22 @@ class session
                     $accounttype = $this->defaults->getNormal();
                     //register new user
                     $generatedPasskey = md5($password)."-blark-".md5((md5("-blark-").$salt)).md5($password);
-                    $sqs = "INSERT INTO `users`(`username`, `email`, `name`, `gender`,`married`, `interestedin`, `phone`, `blooggroup`, `lastseencountry`, `lastseencity`, `lastseencoords`, `accounttype`, `gc`, `verified`, `enabled`, `ltimein`, `description`,`dob`, `token`,`pverified`, `bverified`, `passkey`, `PNID`, `salt`, `created`) VALUES ('$userid', '$email', '$name', '$gender','$married', '$interestedin', '$phone', '$bloodgroup', '', '', '', '$accounttype', '$newuserdefaultgc', 'true', 'true', '', '$description', '$dob', '', 'true', 'false', '$generatedPasskey', '',  '$salt', now())";
+                    $sqs = "INSERT INTO `users`(`username`, `email`, `name`, `gender`,`married`, `interestedin`, `phone`, `blooggroup`, `lastseencountry`, `lastseencity`, `lastseencoords`, `accounttype`, `gc`, `verified`, `enabled`, `ltimein`, `description`,`dob`, `token`,`pverified`, `bverified`, `passkey`, `PNID`, `salt`, `created`) VALUES ('$userid', '$email', '$name', '$gender','$married', '$interestedin', '$phone', '$bloodgroup', '', '', '', '$accounttype', '$newuserdefaultgc', 'true', 'true', '', '$description', '$dob', '', 'true', 'false', '$generatedPasskey', '', '$salt', now())";
                     $this->sessiondb->execute_no_return($sqs);
+                    
+                    //insert new user notification settings, but get the new registered userdbid
+                    $newuserdbid = $this->sessiondb->execute_return("SELECT `id`  FROM `users` WHERE username='$userid'")[0]["id"];
+                   if($this->sessiondb->execute_count_no_return("SELECT COUNT(*) FROM `usersnotificationsettings` WHERE userid = '$newuserdbid'") == 1){
+                       //delete unbalance user's notification settings record
+                       $this->sessiondb->execute_no_return("DELETE FROM `usersnotificationsettings` WHERE userid = '$newuserdbid'");
+                   }
+                    $this->sessiondb->execute_no_return("INSERT INTO `usersnotificationsettings`(`userid`, `general`, `admin`, `messages`, `YUP`, `gift`, `YUPError`, `giftError`, `messageError`, `matchGN`) VALUES ('$newuserdbid', 'true', 'true', 'true', 'true', 'true', 'true', 'true', 'true', 'true')");
+                    
+                    //Wrapping up
                     $this->response["response"] = "success";
                     $this->response["message"] = "Your registration was successful";
             }
+            
             return json_encode($this->response, 1);
 
     }
@@ -133,44 +247,6 @@ class session
     
     public function checkUsernameExist($userid)
     {
-         //check if users table exist
-                if($this->sessiondb->execute_count_table_no_return("users") == 0)
-                {   
-                    $tablequery = "
-                    CREATE TABLE `users` ( 
-                        `id` INT(16) NOT NULL AUTO_INCREMENT , 
-                        `username` VARCHAR(160) NOT NULL ,
-                        `email` VARCHAR(160) NOT NULL ,
-                        `name` VARCHAR(160) NOT NULL ,
-                        `gender` VARCHAR(160) NOT NULL ,
-                        `married` VARCHAR(160) NOT NULL ,
-                        `interestedin` VARCHAR(160) NOT NULL ,
-                        `phone` VARCHAR(160) NOT NULL ,
-                        `blooggroup` VARCHAR(160) NOT NULL ,
-                        `lastseencountry` VARCHAR(160) NOT NULL ,
-                        `lastseencity` VARCHAR(160) NOT NULL ,
-                        `lastseencoords` VARCHAR(160) NOT NULL ,
-                        `accounttype` VARCHAR(160) NOT NULL ,
-                        `gc` VARCHAR(160) NOT NULL ,
-                        `verified` VARCHAR(160) NOT NULL ,
-                        `enabled` VARCHAR(160) NOT NULL ,
-                        `ltimein` VARCHAR(160) NOT NULL ,
-                        `description` TEXT NOT NULL,
-                        `dob` DATE NOT NULL,
-                        `token` TEXT NOT NULL,
-                        `pverified` VARCHAR(160) NOT NULL ,
-                        `bverified` VARCHAR(160) NOT NULL ,
-                        `passkey` VARCHAR(160) NOT NULL,
-                        `PNID` VARCHAR(160) NOT NULL,
-                        `salt` VARCHAR(160) NOT NULL,
-                        `created` VARCHAR(160) NOT NULL,
-                        PRIMARY KEY (`id`), 
-                        UNIQUE (`username`, `email`, `phone`)) ENGINE = InnoDB;";
-                    $this->sessiondb->execute_no_return($tablequery);
-                }
-                
- 
-          
             //check if user exist in users table
             $useridsql = "SELECT COUNT(*) FROM `users` WHERE username='$userid'";
             
@@ -193,78 +269,8 @@ class session
 
     public function setusersession($userid, $password, $PNID)
     {
-         //check if users table exist
-                if($this->sessiondb->execute_count_table_no_return("users") == 0)
-                {   
-                    $tablequery = "
-                    CREATE TABLE `users` ( 
-                        `id` INT(16) NOT NULL AUTO_INCREMENT , 
-                        `username` VARCHAR(160) NOT NULL ,
-                        `email` VARCHAR(160) NOT NULL ,
-                        `name` VARCHAR(160) NOT NULL ,
-                        `gender` VARCHAR(160) NOT NULL ,
-                        `married` VARCHAR(160) NOT NULL ,
-                        `interestedin` VARCHAR(160) NOT NULL ,
-                        `phone` VARCHAR(160) NOT NULL ,
-                        `blooggroup` VARCHAR(160) NOT NULL ,
-                        `lastseencountry` VARCHAR(160) NOT NULL ,
-                        `lastseencity` VARCHAR(160) NOT NULL ,
-                        `lastseencoords` VARCHAR(160) NOT NULL ,
-                        `accounttype` VARCHAR(160) NOT NULL ,
-                        `gc` VARCHAR(160) NOT NULL ,
-                        `verified` VARCHAR(160) NOT NULL ,
-                        `enabled` VARCHAR(160) NOT NULL ,
-                        `ltimein` VARCHAR(160) NOT NULL ,
-                        `description` TEXT NOT NULL,
-                        `dob` DATE NOT NULL,
-                        `token` TEXT NOT NULL,
-                        `pverified` VARCHAR(160) NOT NULL ,
-                        `bverified` VARCHAR(160) NOT NULL ,
-                        `passkey` VARCHAR(160) NOT NULL,
-                        `PNID` VARCHAR(160) NOT NULL,
-                        `salt` VARCHAR(160) NOT NULL,
-                        `created` VARCHAR(160) NOT NULL,
-                        PRIMARY KEY (`id`), 
-                        UNIQUE (`username`, `email`, `phone`)) ENGINE = InnoDB;";
-                    $this->sessiondb->execute_no_return($tablequery);
-                }
-
-            //check if usersession table exist
-                if($this->sessiondb->execute_count_table_no_return("usersession") == 0)
-                {
-                    $tablequery = "
-                    CREATE TABLE `usersession` ( 
-                        `id` INT(16) NOT NULL AUTO_INCREMENT , 
-                        `userid` VARCHAR(160) NOT NULL , 
-                        `taction` VARCHAR(160) NOT NULL , 
-                        `token` TEXT NOT NULL ,
-                        `created` VARCHAR(160) NOT NULL ,
-                        `lastseencoords` VARCHAR(160) NOT NULL ,
-                        `validity` VARCHAR(160) NOT NULL , 
-                        PRIMARY KEY (`id`)) ENGINE = InnoDB;";
-                    $this->sessiondb->execute_no_return($tablequery);
-                }
-                
-                
-                 if($this->sessiondb->execute_count_table_no_return("gallery") == 0)
-                {
-                    $tablequery = "
-                    CREATE TABLE `gallery` ( 
-                        `id` INT(16) NOT NULL AUTO_INCREMENT , 
-                        `userid` VARCHAR(160) NOT NULL ,
-                        `title` VARCHAR(160) NOT NULL ,
-                        `type` VARCHAR(160) NOT NULL ,
-                        `ext` TEXT NOT NULL ,
-                        `isprofilepicture` VARCHAR(160) NOT NULL ,
-                        `uploaded` VARCHAR(160) NOT NULL , 
-                        PRIMARY KEY (`id`),
-                        UNIQUE (`title`)) ENGINE = InnoDB;";
-                    $this->sessiondb->execute_no_return($tablequery);
-                }
-                
- 
             //check if user exist in users table
-            $sql = "SELECT `id`, `username`, `email`, `name`, `gender`, `married`, `interestedin`, `phone`, `blooggroup`, `description`,`dob`,`token`, `accounttype`, `gc`, `verified`, `enabled`, `ltimein`, `pverified`, `bverified`, `passkey`, `salt`  FROM `users` WHERE username='$userid'";
+            $sql = "SELECT `id`, `username`, `email`, `name`, `gender`, `married`, `interestedin`, `phone`, `blooggroup`, `description`,`dob`,`token`, `accounttype`, `gc`, `verified`, `enabled`, `ltimein`, `pverified`, `bverified`, `passkey`, `PNID`, `salt`  FROM `users` WHERE username='$userid'";
             if(count($this->sessiondb->execute_return($sql)) < 1)
             {
                 //User does not exist
@@ -278,6 +284,7 @@ class session
                $verified = $this->sessiondb->execute_return($sql)[0]['verified'];
                $enabled = $this->sessiondb->execute_return($sql)[0]['enabled'];
                $accounttype = $this->sessiondb->execute_return($sql)[0]['accounttype'];
+               $dbPNID = $this->sessiondb->execute_return($sql)[0]['PNID'];
                
                if($verified == "false")
                {
@@ -299,7 +306,108 @@ class session
                 {
                     $this->deleteLoginSession($dbuserid);
                     $tcode = $this->token->getToken();
-                     //update login token and ltimein
+                    //create sql varaible
+                    $upsql = "";
+                    
+                    //boot up an expo SDK instance
+                    $expo = \ExponentPhpSDK\Expo::normalSetup();
+                    
+                    //get user's notification settings
+                 $userdbnotificationsettings = $this->sessiondb->execute_return("SELECT * FROM `usersnotificationsettings` WHERE userid = '$dbuserid'")[0];
+                   
+                    //check if device PNID is changed or is not set
+                     if($PNID != $dbPNID)
+                    {
+                        //new device detected
+                        
+                        //unsubscribe previous device from channnels
+                        $expo->unsubscribe($email."-0", $dbPNID); //Unsubscribe previous device from General Notification
+                        $expo->unsubscribe($email."-1", $dbPNID); //Unsubscribe previous device from YUP Notification
+                        $expo->unsubscribe($email."-2", $dbPNID); //Unsubscribe previous device from Match Notification
+                        $expo->unsubscribe($email."-3", $dbPNID); //Unsubscribe previous device from Gift Notification
+                        $expo->unsubscribe($email."-4", $dbPNID); //Unsubscribe previous device from Yup Error Notification
+                        $expo->unsubscribe($email."-5", $dbPNID); //Unsubscribe previous device from Gift Error Notification
+                        $expo->unsubscribe($email."-6", $dbPNID); //Unsubscribe previous device from Message Notification
+                        $expo->unsubscribe($email."-7", $dbPNID); //Unsubscribe previous device from Message Error Notification
+                        $expo->unsubscribe($email."-8", $dbPNID); //Unsubscribe previous device from Admin Notification
+                        
+                        //subscribe device to channnels on log in based on their user notification settings
+                        if($userdbnotificationsettings['general'] == "true")
+                            $expo->subscribe($email."-0", $PNID); //Subscribe new device from General Notification
+                        if($userdbnotificationsettings['admin'] == "true")
+                            $expo->subscribe($email."-8", $PNID); //Subscribe new device from Admin Notification
+                        if($userdbnotificationsettings['messages'] == "true")
+                            $expo->subscribe($email."-6", $PNID); //Subscribe new device from Message Notification
+                        if($userdbnotificationsettings['YUP'] == "true")
+                            $expo->subscribe($email."-1", $PNID); //Subscribe new device from YUP Notification
+                        if($userdbnotificationsettings['gift'] == "true")
+                            $expo->subscribe($email."-3", $PNID); //Subscribe new device from Gift Notification
+                        if($userdbnotificationsettings['YUPError'] == "true")
+                            $expo->subscribe($email."-4", $PNID); //Subscribe new device from Yup Error Notification
+                        if($userdbnotificationsettings['giftError'] == "true")
+                            $expo->subscribe($email."-5", $PNID); //Subscribe new device from Gift Error Notification
+                        if($userdbnotificationsettings['messageError'] == "true")
+                            $expo->subscribe($email."-7", $PNID); //Subscribe new device from Message Error Notification
+                        if($userdbnotificationsettings['matchGN'] == "true")
+                            $expo->subscribe($email."-2", $PNID); //Subscribe new device from Match Notification
+                       
+                        
+                        //send security alerts mail
+                    }
+                    else{
+                        
+                        //subscribe device to channnels on log in based on their user notification settings
+                        if($userdbnotificationsettings['general'] == "true")
+                            $expo->subscribe($email."-0", $PNID); //Subscribe device from General Notification
+                        else
+                            $expo->unsubscribe($email."-0", $PNID); //Unsubscribe device from General Notification
+                        
+                        if($userdbnotificationsettings['admin'] == "true")
+                            $expo->subscribe($email."-8", $PNID); //Subscribe device from Admin Notification
+                        else
+                            $expo->unsubscribe($email."-8", $PNID); //Unsubscribe device from Admin Notification
+                        
+                        if($userdbnotificationsettings['messages'] == "true")
+                            $expo->subscribe($email."-6", $PNID); //Subscribe device from Message Notification
+                        else
+                            $expo->unsubscribe($email."-6", $PNID); //Unsubscribe device from Message Notification
+                        
+                        if($userdbnotificationsettings['YUP'] == "true")
+                            $expo->subscribe($email."-1", $PNID); //Subscribe device from YUP Notification
+                        else
+                            $expo->unsubscribe($email."-1", $PNID); //Unsubscribe device from YUP Notification
+                        
+                        if($userdbnotificationsettings['gift'] == "true")
+                            $expo->subscribe($email."-3", $PNID); //Subscribe device from Gift Notification
+                        else
+                            $expo->unsubscribe($email."-3", $PNID); //Unsubscribe device from Gift Notification
+                        
+                        if($userdbnotificationsettings['YUPError'] == "true")
+                            $expo->subscribe($email."-4", $PNID); //Subscribe device from Yup Error Notification
+                        else
+                            $expo->unsubscribe($email."-4", $PNID); //Unsubscribe device from Yup Error Notification
+                        
+                        if($userdbnotificationsettings['giftError'] == "true")
+                            $expo->subscribe($email."-5", $PNID); //Subscribe device from Gift Error Notification
+                        else
+                            $expo->unsubscribe($email."-5", $PNID); //Unsubscribe device from Gift Error Notification
+                        
+                        if($userdbnotificationsettings['messageError'] == "true")
+                            $expo->subscribe($email."-7", $PNID); //Subscribe device from Message Error Notification
+                        else
+                            $expo->unsubscribe($email."-7", $PNID); //Unsubscribe device from Message Error Notification
+                        
+                        if($userdbnotificationsettings['matchGN'] == "true")
+                            $expo->subscribe($email."-2", $PNID); //Subscribe device from Match Notification
+                        else
+                            $expo->unsubscribe($email."-2", $PNID); //Unsubscribe device from Match Notification
+                        
+                    }
+                    
+
+                     
+                     
+                    //update login token, coords, PNID & ltimein
                     $upsql = "UPDATE `users` SET `token`='$tcode', `lastseencoords`='', `ltimein`=now(), `PNID`='$PNID'  WHERE email='$email'";
                     $this->sessiondb->execute_no_return($upsql);
                     $this->updateusersessionaction($dbuserid, $tcode, $this->defaults->getActionType()[0], '');
@@ -327,9 +435,14 @@ class session
                     {
                         $dbvalues['gallery'] = array();
                     }
+                    
+                    
                     unset($dbvalues['salt']);
                     unset($dbvalues['id']);
                     unset($dbvalues['passkey']);
+                    unset($userdbnotificationsettings['id']);
+                    unset($userdbnotificationsettings['userid']);
+                    $dbvalues['notificationsettings'] = $userdbnotificationsettings;
                     $this->response["response"] = true;
                     $this->response["message"] = "Signed in";
                     $this->response['data'] = $dbvalues;
@@ -413,41 +526,6 @@ class session
     
        public function checkEmailNotVerified($username)
     {
-                 if($this->sessiondb->execute_count_table_no_return("users") == 0)
-                {   
-                    $tablequery = "
-                    CREATE TABLE `users` ( 
-                        `id` INT(16) NOT NULL AUTO_INCREMENT , 
-                        `username` VARCHAR(160) NOT NULL ,
-                        `email` VARCHAR(160) NOT NULL ,
-                        `name` VARCHAR(160) NOT NULL ,
-                        `gender` VARCHAR(160) NOT NULL ,
-                        `married` VARCHAR(160) NOT NULL ,
-                        `interestedin` VARCHAR(160) NOT NULL ,
-                        `phone` VARCHAR(160) NOT NULL ,
-                        `blooggroup` VARCHAR(160) NOT NULL ,
-                        `lastseencountry` VARCHAR(160) NOT NULL ,
-                        `lastseencity` VARCHAR(160) NOT NULL ,
-                        `lastseencoords` VARCHAR(160) NOT NULL ,
-                        `accounttype` VARCHAR(160) NOT NULL ,
-                        `gc` VARCHAR(160) NOT NULL ,
-                        `verified` VARCHAR(160) NOT NULL ,
-                        `enabled` VARCHAR(160) NOT NULL ,
-                        `ltimein` VARCHAR(160) NOT NULL ,
-                        `description` TEXT NOT NULL,
-                        `dob` DATE NOT NULL,
-                        `token` TEXT NOT NULL,
-                        `pverified` VARCHAR(160) NOT NULL ,
-                        `bverified` VARCHAR(160) NOT NULL ,
-                        `passkey` VARCHAR(160) NOT NULL,
-                        `PNID` VARCHAR(160) NOT NULL,
-                        `salt` VARCHAR(160) NOT NULL,
-                        `created` VARCHAR(160) NOT NULL,
-                        PRIMARY KEY (`id`), 
-                        UNIQUE (`username`, `email`, `phone`)) ENGINE = InnoDB;";
-                    $this->sessiondb->execute_no_return($tablequery);
-                }   
-                
             $sql = "SELECT email, id, verified FROM `users` WHERE username='$username'";
             if(count($this->sessiondb->execute_return($sql)) > 0)
             {
@@ -480,19 +558,6 @@ class session
     
     public function verifyaccount($username, $code)
     {
-                if($this->sessiondb->execute_count_table_no_return("codes") == 0)
-                {
-                    $tablequery = "
-                    CREATE TABLE `codes` ( 
-                        `id` INT(16) NOT NULL AUTO_INCREMENT , 
-                        `userid` VARCHAR(160) NOT NULL , 
-                        `action` VARCHAR(160) NOT NULL , 
-                        `code` VARCHAR(160) NOT NULL ,
-                        `created` VARCHAR(160) NOT NULL ,
-                        PRIMARY KEY (`id`)) ENGINE = InnoDB;";
-                    $this->sessiondb->execute_no_return($tablequery);
-                }   
-                
             $sql = "SELECT email, id, verified FROM `users` WHERE username='$username'";
             if(count($this->sessiondb->execute_return($sql)) > 0)
             {
@@ -577,19 +642,6 @@ class session
     
         public function recoverpassword($username, $code, $newpassword)
     {
-                if($this->sessiondb->execute_count_table_no_return("codes") == 0)
-                {
-                    $tablequery = "
-                    CREATE TABLE `codes` ( 
-                        `id` INT(16) NOT NULL AUTO_INCREMENT , 
-                        `userid` VARCHAR(160) NOT NULL , 
-                        `action` VARCHAR(160) NOT NULL , 
-                        `code` VARCHAR(160) NOT NULL ,
-                        `created` VARCHAR(160) NOT NULL ,
-                        PRIMARY KEY (`id`)) ENGINE = InnoDB;";
-                    $this->sessiondb->execute_no_return($tablequery);
-                }   
-                
             $sql = "SELECT email, id FROM `users` WHERE username='$username'";
             if(count($this->sessiondb->execute_return($sql)) > 0)
             {
@@ -642,19 +694,6 @@ class session
     
         public function getEmailVericationcode($email)
     {
-                if($this->sessiondb->execute_count_table_no_return("codes") == 0)
-                {
-                    $tablequery = "
-                    CREATE TABLE `codes` ( 
-                        `id` INT(16) NOT NULL AUTO_INCREMENT , 
-                        `userid` VARCHAR(160) NOT NULL , 
-                        `action` VARCHAR(160) NOT NULL , 
-                        `code` VARCHAR(160) NOT NULL ,
-                        `created` VARCHAR(160) NOT NULL ,
-                        PRIMARY KEY (`id`)) ENGINE = InnoDB;";
-                    $this->sessiondb->execute_no_return($tablequery);
-                }
-                
             $sql = "SELECT username, id, verified FROM `users` WHERE email='$email'";
             if(count($this->sessiondb->execute_return($sql)) > 0)
             {
@@ -710,21 +749,8 @@ class session
             
     }
     
-    public function updateusersessionaction($dbuserid, $token, $action, $lastseencoords){
-        if($this->sessiondb->execute_count_table_no_return("usersession") == 0)
-                {
-                    $tablequery = "
-                    CREATE TABLE `usersession` ( 
-                        `id` INT(16) NOT NULL AUTO_INCREMENT , 
-                        `userid` VARCHAR(160) NOT NULL , 
-                        `taction` VARCHAR(160) NOT NULL , 
-                        `token` TEXT NOT NULL ,
-                        `created` VARCHAR(160) NOT NULL ,
-                        `lastseencoords` VARCHAR(160) NOT NULL ,
-                        `validity` VARCHAR(160) NOT NULL , 
-                        PRIMARY KEY (`id`)) ENGINE = InnoDB;";
-                    $this->sessiondb->execute_no_return($tablequery);
-                }
+    public function updateusersessionaction($dbuserid, $token, $action, $lastseencoords)
+    {
         $sqs = "INSERT INTO usersession (userid, taction, token, created, lastseencoords, validity) VALUES('$dbuserid', '$action', '$token', now(), '$lastseencoords', 'true')";
         $this->sessiondb->execute_no_return($sqs); 
     }
@@ -766,20 +792,6 @@ class session
 
     public function deleteLoginSession($dbuserid)
     {
-        if($this->sessiondb->execute_count_table_no_return("usersession") == 0)
-                {
-                    $tablequery = "
-                    CREATE TABLE `usersession` ( 
-                        `id` INT(16) NOT NULL AUTO_INCREMENT , 
-                        `userid` VARCHAR(160) NOT NULL , 
-                        `taction` VARCHAR(160) NOT NULL , 
-                        `token` TEXT NOT NULL ,
-                        `created` VARCHAR(160) NOT NULL ,
-                        `lastseencoords` VARCHAR(160) NOT NULL ,
-                        `validity` VARCHAR(160) NOT NULL , 
-                        PRIMARY KEY (`id`)) ENGINE = InnoDB;";
-                    $this->sessiondb->execute_no_return($tablequery);
-                }
         //delete login session
         if($dbuserid != null && $dbuserid != "")
         {
