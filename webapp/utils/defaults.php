@@ -35,7 +35,9 @@ class defaults
              "Action to perform gift",
              "Action to perform view gift",
              "Action to fetch user gifted items",
-             "Action to fetch available gift items"
+             "Action to fetch available gift items",
+             "Action to perform nope",
+             "Action to perform unmatch"
              );
          $this->expiryTimes = array(
              "verification" =>300, 
@@ -82,6 +84,8 @@ class defaults
            "updateMatches",  //2 - Update or Get User Matches
            "performYUP", //3 - Perform yup Request
            "performGift", //4 - Perform Gifting Request
+           "performNope", //5 - Perform Gifting Request
+           "performUnMatch", //6 - Perform Gifting Request
          );
     }
     public function getActions(){

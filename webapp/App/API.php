@@ -291,6 +291,22 @@
                               }
                               
                           }
+                          else if($_POST['action'] == $defaultRegex->getActions()[5])
+                          {
+                              if(isset($_POST['matchuserdbID']) && $_POST['matchuserdbID'] != null && isset($_POST['coords']) && $_POST['coords'] != null){
+                                  
+                                  $matchuserdbID = (int)trim($_POST['matchuserdbID']);
+                                  $coords = $_POST['coords'];
+                                  die($currentprofile->Nope($userid, $matchuserdbID, $coords, $token));
+                              }
+                              else
+                              {
+                                    $response["response"] = "error-invalid-nope-request-params";
+                                    $response["message"] = "Invalid criterias for performing YUP request, action dismissed";
+                                    die(json_encode($response, 1));
+                              }
+                              
+                          }
                           else if($_POST['action'] == $defaultRegex->getActions()[4])
                           {
                               if(isset($_POST['matchuserdbID']) && $_POST['matchuserdbID'] != null && isset($_POST['coords']) && $_POST['coords'] != null){

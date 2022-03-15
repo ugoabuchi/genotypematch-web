@@ -114,6 +114,7 @@ class session
                         `giftError` VARCHAR(160) NOT NULL ,
                         `messageError` VARCHAR(160) NOT NULL ,
                         `matchGN` VARCHAR(160) NOT NULL ,
+                        `unmatchGN` VARCHAR(160) NOT NULL ,
                         PRIMARY KEY (`id`), 
                         UNIQUE (`userid`)) ENGINE = InnoDB;";
                     $this->sessiondb->execute_no_return($tablequery);
@@ -330,6 +331,7 @@ class session
                         $expo->unsubscribe($email."-6", $dbPNID); //Unsubscribe previous device from Message Notification
                         $expo->unsubscribe($email."-7", $dbPNID); //Unsubscribe previous device from Message Error Notification
                         $expo->unsubscribe($email."-8", $dbPNID); //Unsubscribe previous device from Admin Notification
+                        $expo->unsubscribe($email."-9", $dbPNID); //Unsubscribe previous device from Un-Match Notification
                         
                         //subscribe device to channnels on log in based on their user notification settings
                         if($userdbnotificationsettings['general'] == "true")
@@ -350,9 +352,11 @@ class session
                             $expo->subscribe($email."-7", $PNID); //Subscribe new device from Message Error Notification
                         if($userdbnotificationsettings['matchGN'] == "true")
                             $expo->subscribe($email."-2", $PNID); //Subscribe new device from Match Notification
+                        if($userdbnotificationsettings['unmatchGN'] == "true")
+                            $expo->subscribe($email."-9", $PNID); //Subscribe new device from Un-Match Notification
                        
                         
-                        //send security alerts mail
+                        //subscribe security alerts mail
                     }
                     else{
                         
@@ -401,6 +405,11 @@ class session
                             $expo->subscribe($email."-2", $PNID); //Subscribe device from Match Notification
                         else
                             $expo->unsubscribe($email."-2", $PNID); //Unsubscribe device from Match Notification
+                        
+                        if($userdbnotificationsettings['unmatchGN'] == "true")
+                            $expo->subscribe($email."-9", $PNID); //Subscribe device from Un-Match Notification
+                        else
+                            $expo->unsubscribe($email."-9", $PNID); //Unsubscribe device from Un-Match Notification
                         
                     }
                     

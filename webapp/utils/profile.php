@@ -553,7 +553,27 @@ class profile
                 $matchsql = "SELECT `id`, `username`, `name`, `lastseencountry`, `lastseencity`, `lastseencoords`, `gender`, `blooggroup`, `accounttype`, `description`, `pverified`, `bverified`, `dob` FROM `users` WHERE PNID != '' AND ".$removemainuserfrommatch." AND ".$countryconcatsql." AND ".$cityconcatsql." AND ".$accountconcatsql." AND ".$genderconcatsql." AND ".$blooggroupconcatsql." AND ".$ageconcatsql." ".$randsql." ".$limitsql." ".$offsetsql;
                 
                 //perform query
-                $matchData = $this->sessiondb->execute_return($matchsql);
+                $matchData = null;
+                
+                //remove matches if they already matched themselves
+                $muserdbid = $udetails['id'];
+                $testmatchData = $this->sessiondb->execute_return($matchsql);
+                if(is_array($testmatchData) == true && count($testmatchData) > 0)
+                {
+                    foreach ($testmatchData as $testmatcher => $value){
+                    $mmatchdbid = $value['id'];
+                    if($this->chekIfItsAMatvh($muserdbid, $mmatchdbid) == true)
+                            continue;
+                    else
+                        $matchData[$testmatcher] = $value;
+                    }
+                }
+                else
+                {
+                    $matchData = [];
+                }
+                
+                
                 if(is_array($matchData) == true && count($matchData) > 0)
                 {
                     
@@ -663,7 +683,25 @@ class profile
                 $matchsql = "SELECT `id`, `username`, `name`, `lastseencountry`, `lastseencity`, `lastseencoords`, `gender`, `blooggroup`, `accounttype`, `description`, `pverified`, `bverified`, `dob` FROM `users` WHERE PNID != '' AND ".$removemainuserfrommatch." AND ".$countryconcatsql." AND ".$cityconcatsql." AND ".$accountconcatsql." AND ".$genderconcatsql." AND ".$blooggroupconcatsql." AND ".$ageconcatsql." ".$randsql." ".$limitsql." ".$offsetsql;
                 
                 //perform query
-                $matchData = $this->sessiondb->execute_return($matchsql);
+                $matchData = null;
+                
+                //remove matches if they already matched themselves
+                $muserdbid = $udetails['id'];
+                $testmatchData = $this->sessiondb->execute_return($matchsql);
+                if(is_array($testmatchData) == true && count($testmatchData) > 0)
+                {
+                    foreach ($testmatchData as $testmatcher => $value){
+                    $mmatchdbid = $value['id'];
+                    if($this->chekIfItsAMatvh($muserdbid, $mmatchdbid) == true)
+                            continue;
+                    else
+                        $matchData[$testmatcher] = $value;
+                    }
+                }
+                else
+                {
+                    $matchData = [];
+                }
                 
                 if(is_array($matchData) == true && count($matchData) > 0)
                 {
@@ -757,7 +795,26 @@ class profile
                 $matchsql = "SELECT `id`, `username`, `name`, `lastseencountry`, `lastseencity`, `lastseencoords`, `gender`, `blooggroup`, `accounttype`, `description`, `pverified`, `bverified`, `dob` FROM `users` WHERE PNID != '' AND ".$removemainuserfrommatch." AND ".$countryconcatsql." AND ".$cityconcatsql." AND ".$accountconcatsql." AND ".$genderconcatsql." AND ".$blooggroupconcatsql." AND ".$ageconcatsql." ".$randsql." ".$limitsql." ".$offsetsql;
                 
                 //perform query
-                $matchData = $this->sessiondb->execute_return($matchsql);
+                $matchData = null;
+                
+                //remove matches if they already matched themselves
+                $muserdbid = $udetails['id'];
+                $testmatchData = $this->sessiondb->execute_return($matchsql);
+                if(is_array($testmatchData) == true && count($testmatchData) > 0)
+                {
+                    foreach ($testmatchData as $testmatcher => $value){
+                    $mmatchdbid = $value['id'];
+                    if($this->chekIfItsAMatvh($muserdbid, $mmatchdbid) == true)
+                            continue;
+                    else
+                        $matchData[$testmatcher] = $value;
+                    }
+                }
+                else
+                {
+                    $matchData = [];
+                }
+                
                 if(is_array($matchData) == true && count($matchData) > 0)
                 {
                     
@@ -885,6 +942,7 @@ class profile
             6 -> Message Notification
             7 -> Message Error Notification
             8 -> Admin Notification
+         *  9 -> UnMatch Notification
 
         */
 
@@ -1022,6 +1080,125 @@ class profile
                 {
                     $this->sendNotification($matchuserdbid, $userdbid, "yup-invalid-match-user", 4);
                     $this->response['response'] = "invalid-match-user";
+                }
+               
+        return json_encode($this->response, 1);
+    }
+    
+     public function Nope($userid, $matchuserdbid, $lastseencoords, $token){
+        
+        //check if match table exist
+                if($this->sessiondb->execute_count_table_no_return("matches") == 0)
+                {
+                    $tablequery = "
+                    CREATE TABLE `matches` ( 
+                        `id` INT(16) NOT NULL AUTO_INCREMENT , 
+                        `userdbid` VARCHAR(160) NOT NULL ,
+                        `matchdbid` VARCHAR(160) NOT NULL ,
+                        `timestamp` VARCHAR(160) NOT NULL , 
+                        PRIMARY KEY (`id`)) ENGINE = InnoDB;";
+                    $this->sessiondb->execute_no_return($tablequery);
+                }
+                
+               //check if matchuser exist
+                $museridcheck = $this->sessiondb->execute_count_no_return("SELECT COUNT(*) from users WHERE id = '$matchuserdbid'");
+                if($museridcheck ==1)
+                {
+                    //get initiator dbid
+                    $userdbid = $this->sessiondb->execute_return("SELECT id FROM users WHERE username='$userid'")[0]['id'];
+                    //check if already liked
+                    
+                    $checkifalreadyliked = $this->sessiondb->execute_count_no_return("SELECT COUNT(*) FROM matches WHERE userdbid='$userdbid' AND matchdbid='$matchuserdbid'");
+                    
+                    if($checkifalreadyliked == 1)
+                    {
+                        
+                        //check if match exist before performing nope
+                        if($this->chekIfItsAMatvh($userdbid, $matchuserdbid) == false)
+                        {
+                            //remove liked action
+                            $this->sessiondb->execute_no_return("DELETE FROM matches WHERE userdbid='$userdbid' AND matchdbid='$matchuserdbid'");
+                            $this->updateusersessionaction($userdbid, $token, $this->defaults->getActionType()[10], $lastseencoords);
+                            $this->response['response'] = true;
+
+                        }
+                        else
+                        {
+                            $this->response['response'] = "nope-already-matched";
+                        }
+                        
+                        
+
+                    }
+                    else
+                    {
+                        $this->response['response'] = "nope-not-already-liked";
+                    }
+                
+                }
+                else
+                {
+                    $this->response['response'] = "nope-invalid-match-user";
+                }
+               
+        return json_encode($this->response, 1);
+    }
+    
+         public function UnMatch($userid, $matchuserdbid, $lastseencoords, $token){
+        
+        //check if match table exist
+                if($this->sessiondb->execute_count_table_no_return("matches") == 0)
+                {
+                    $tablequery = "
+                    CREATE TABLE `matches` ( 
+                        `id` INT(16) NOT NULL AUTO_INCREMENT , 
+                        `userdbid` VARCHAR(160) NOT NULL ,
+                        `matchdbid` VARCHAR(160) NOT NULL ,
+                        `timestamp` VARCHAR(160) NOT NULL , 
+                        PRIMARY KEY (`id`)) ENGINE = InnoDB;";
+                    $this->sessiondb->execute_no_return($tablequery);
+                }
+                
+               //check if matchuser exist
+                $museridcheck = $this->sessiondb->execute_count_no_return("SELECT COUNT(*) from users WHERE id = '$matchuserdbid'");
+                if($museridcheck ==1)
+                {
+                    //get initiator dbid
+                    $userdbid = $this->sessiondb->execute_return("SELECT id FROM users WHERE username='$userid'")[0]['id'];
+                    //check if already liked
+                    
+                    $checkifalreadyliked = $this->sessiondb->execute_count_no_return("SELECT COUNT(*) FROM matches WHERE userdbid='$userdbid' AND matchdbid='$matchuserdbid'");
+                    
+                    if($checkifalreadyliked == 1)
+                    {
+                        
+                        //check if match exist before performing nope
+                        if($this->chekIfItsAMatvh($userdbid, $matchuserdbid) == true)
+                        {
+                            //remove liked action
+                            $this->sessiondb->execute_no_return("DELETE FROM matches WHERE (userdbid='$userdbid' AND matchdbid='$matchuserdbid') OR (userdbid='$matchuserdbid' AND matchdbid='$userdbid')");
+                            $this->updateusersessionaction($userdbid, $token, $this->defaults->getActionType()[11], $lastseencoords);
+                            $this->sendNotification($matchuserdbid, $userdbid,"user-unmatch-success", 9);
+                            $this->response['response'] = true;
+
+                        }
+                        else
+                        {
+                            $this->response['response'] = "match-not-already-matched";
+                        }
+                        
+                        
+
+                    }
+                    else
+                    {
+                        $this->response['response'] = "match-not-already-liked";
+                    }
+                
+                }
+                else
+                {
+                    $this->response['response'] = "match-invalid-match-user";
                 }
                
         return json_encode($this->response, 1);

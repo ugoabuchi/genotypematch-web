@@ -4,6 +4,8 @@ require_once (dirname(  __FILE__).'/composer/vendor/autoload.php');
 require_once ( dirname(  __FILE__)."/logwriter.php" );
 require_once ( dirname(  __FILE__)."/database.php" );
 
+
+$mypool = Spatie\Async\Pool::create();
 $logger = new logwriter();
 $logid = "genotypematch-web-log.txt";
 
@@ -42,13 +44,36 @@ if(is_array($notificationQuery) && count($notificationQuery) > 0)
             $recipient = $matchdbidDetails['PNID'];
             $notificationPayLoad = array(
             'title' => 'GenotypeMatch',
-            'body' => $userdbidname.' Just Yupped You',
+            'body' => $userdbidname.' - Yupped',
             'data' => $data
             );
             
+            
+           /* $mypool->
+                add(function () {
+                    // ...
+                })
+                ->then(function ($output) {
+                    // On success, `$output` is returned by the process or callable you passed to the queue.
+                })
+                ->catch(function ($exception) {
+                    // When an exception is thrown from within a process, it's caught and passed here.
+                })
+                ->timeout(function () {
+                    // A process took too long to finish.
+                })
+            ;
+            */
+            if($mypool->isSupported() == true)
+            {
+                $logger->log(dirname(  __FILE__)."/../../logs/".$logid, "Pool supported");
+            }
+            else{
+                $logger->log(dirname(  __FILE__)."/../../logs/".$logid, "Pool not supported");
+            }
             //boot up an expo SDK instance
-            $expo = \ExponentPhpSDK\Expo::normalSetup();
-            $expo->notify([$channelName], $notificationPayLoad);
+            //$expo = \ExponentPhpSDK\Expo::normalSetup();
+            //$expo->notify([$channelName], $notificationPayLoad);
             
             //update notification table
             //$db->execute_no_return("UPDATE `notifications` SET sent='true' WHERE id='$notificationID'");
