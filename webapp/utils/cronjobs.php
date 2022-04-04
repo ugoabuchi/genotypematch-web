@@ -11,6 +11,7 @@ $logid = "genotypematch-web-log.txt";
 
 $db = new database("gm");
 
+
 //perform cron for expo push notification
 $notificationQuery = $db->execute_return("SELECT `id`, `userdbid`, `matchdbid`, `type`, `response`, `timestamp` FROM `notifications` WHERE sent='false'");
 //proceed only if a notification exist
@@ -48,35 +49,39 @@ if(is_array($notificationQuery) && count($notificationQuery) > 0)
             'data' => $data
             );
             
-            
-           /* $mypool->
-                add(function () {
-                    // ...
-                })
-                ->then(function ($output) {
-                    // On success, `$output` is returned by the process or callable you passed to the queue.
-                })
-                ->catch(function ($exception) {
-                    // When an exception is thrown from within a process, it's caught and passed here.
-                })
-                ->timeout(function () {
-                    // A process took too long to finish.
-                })
-            ;
-            */
-            if($mypool->isSupported() == true)
-            {
-                $logger->log(dirname(  __FILE__)."/../../logs/".$logid, "Pool supported");
-            }
-            else{
-                $logger->log(dirname(  __FILE__)."/../../logs/".$logid, "Pool not supported");
-            }
-            //boot up an expo SDK instance
-            //$expo = \ExponentPhpSDK\Expo::normalSetup();
-            //$expo->notify([$channelName], $notificationPayLoad);
-            
-            //update notification table
             //$db->execute_no_return("UPDATE `notifications` SET sent='true' WHERE id='$notificationID'");
+            //calling aync operation global variable
+           $mypool->
+                add(function () use($logger, $logid, $channelName, $notificationPayLoad, $notificationID) {
+                    $expo = \ExponentPhpSDK\Expo::normalSetup();
+                    $expo->notify([$channelName], $notificationPayLoad);
+                    return "success";
+                })
+                ->then(function ($output) use($logger, $logid, $channelName, $notificationPayLoad, $notificationID) {
+                    // On success, `$output` is returned by the process or callable you passed to the queue.
+                    if($output != "success")
+                        {
+                            $expo = \ExponentPhpSDK\Expo::normalSetup();
+                            $expo->notify([$channelName], $notificationPayLoad);
+                            
+                        }
+                    else
+                        $logger->log(dirname(  __FILE__)."/../../logs/".$logid, "Notification successfully sent");
+                })
+                ->catch(function ($exception) use($logger, $logid, $channelName, $notificationPayLoad, $notificationID) {
+                    // When an exception is thrown from within a process, it's caught and passed here.
+                    $expo = \ExponentPhpSDK\Expo::normalSetup();
+                    $expo->notify([$channelName], $notificationPayLoad);
+                    
+                })
+                ->timeout(function () use($logger, $logid, $channelName, $notificationPayLoad, $notificationID) {
+                    // A process took too long to finish.
+                    $expo = \ExponentPhpSDK\Expo::normalSetup();
+                    $expo->notify([$channelName], $notificationPayLoad);
+                    
+                });
+
+            $mypool->wait();
             
         }
     }

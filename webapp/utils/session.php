@@ -322,16 +322,19 @@ class session
                         //new device detected
                         
                         //unsubscribe previous device from channnels
-                        $expo->unsubscribe($email."-0", $dbPNID); //Unsubscribe previous device from General Notification
-                        $expo->unsubscribe($email."-1", $dbPNID); //Unsubscribe previous device from YUP Notification
-                        $expo->unsubscribe($email."-2", $dbPNID); //Unsubscribe previous device from Match Notification
-                        $expo->unsubscribe($email."-3", $dbPNID); //Unsubscribe previous device from Gift Notification
-                        $expo->unsubscribe($email."-4", $dbPNID); //Unsubscribe previous device from Yup Error Notification
-                        $expo->unsubscribe($email."-5", $dbPNID); //Unsubscribe previous device from Gift Error Notification
-                        $expo->unsubscribe($email."-6", $dbPNID); //Unsubscribe previous device from Message Notification
-                        $expo->unsubscribe($email."-7", $dbPNID); //Unsubscribe previous device from Message Error Notification
-                        $expo->unsubscribe($email."-8", $dbPNID); //Unsubscribe previous device from Admin Notification
-                        $expo->unsubscribe($email."-9", $dbPNID); //Unsubscribe previous device from Un-Match Notification
+                        if($dbPNID != "" && !empty($dbPNID))
+                        {
+                            $expo->unsubscribe($email."-0", $dbPNID); //Unsubscribe previous device from General Notification
+                            $expo->unsubscribe($email."-1", $dbPNID); //Unsubscribe previous device from YUP Notification
+                            $expo->unsubscribe($email."-2", $dbPNID); //Unsubscribe previous device from Match Notification
+                            $expo->unsubscribe($email."-3", $dbPNID); //Unsubscribe previous device from Gift Notification
+                            $expo->unsubscribe($email."-4", $dbPNID); //Unsubscribe previous device from Yup Error Notification
+                            $expo->unsubscribe($email."-5", $dbPNID); //Unsubscribe previous device from Gift Error Notification
+                            $expo->unsubscribe($email."-6", $dbPNID); //Unsubscribe previous device from Message Notification
+                            $expo->unsubscribe($email."-7", $dbPNID); //Unsubscribe previous device from Message Error Notification
+                            $expo->unsubscribe($email."-8", $dbPNID); //Unsubscribe previous device from Admin Notification
+                            $expo->unsubscribe($email."-9", $dbPNID); //Unsubscribe previous device from Un-Match Notification
+                        }
                         
                         //subscribe device to channnels on log in based on their user notification settings
                         if($userdbnotificationsettings['general'] == "true")

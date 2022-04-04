@@ -16,7 +16,6 @@ include "webapp/utils/defaults.php";
 include "webapp/utils/mailer.php";
 include "webapp/utils/mailmanager.php";
 include "webapp/utils/requestlocation.php";
-
 /*
 include "../webapp/utils/logwriter.php";
 */

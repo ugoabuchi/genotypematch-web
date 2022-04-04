@@ -6,7 +6,7 @@ ini_set('display_errors', 1);
 ini_set('log_errors', 1);
 define("dbhost", "localhost");
 define("dbuser", "root");
-define("dbpassword", "Blark2018@");
+define("dbpassword", "Hugo2018@");
 define("dbtype", "mysql");
 
 class database {

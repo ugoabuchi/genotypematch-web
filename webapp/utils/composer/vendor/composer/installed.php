@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '7479a7fed1b95ff00a4114ce587babff1e7711da',
+        'reference' => 'd06a4927c28f5caec0c117aefdd4a1de28933a42',
         'name' => '__root__',
         'dev' => true,
     ),
@@ -16,7 +16,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '7479a7fed1b95ff00a4114ce587babff1e7711da',
+            'reference' => 'd06a4927c28f5caec0c117aefdd4a1de28933a42',
             'dev_requirement' => false,
         ),
         'alymosul/exponent-server-sdk-php' => array(
