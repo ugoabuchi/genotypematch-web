@@ -309,13 +309,15 @@ class session
                     $tcode = $this->token->getToken();
                     //create sql varaible
                     $upsql = "";
-                    
-                    //boot up an expo SDK instance
-                    $expo = \ExponentPhpSDK\Expo::normalSetup();
-                    
+
                     //get user's notification settings
                  $userdbnotificationsettings = $this->sessiondb->execute_return("SELECT * FROM `usersnotificationsettings` WHERE userid = '$dbuserid'")[0];
                    
+                    /*
+                    //boot up an expo SDK instance
+                    $expo = \ExponentPhpSDK\Expo::normalSetup();
+                    
+                    
                     //check if device PNID is changed or is not set
                      if($PNID != $dbPNID)
                     {
@@ -414,7 +416,7 @@ class session
                         else
                             $expo->unsubscribe($email."-9", $PNID); //Unsubscribe device from Un-Match Notification
                         
-                    }
+                    }*/
                     
 
                      

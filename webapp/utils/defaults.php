@@ -86,6 +86,7 @@ class defaults
            "performGift", //4 - Perform Gifting Request
            "performNope", //5 - Perform Gifting Request
            "performUnMatch", //6 - Perform Gifting Request
+           "loadAvailableGiftItems", //7 - Perform Gifting Request
          );
     }
     public function getActions(){
@@ -122,6 +123,10 @@ class defaults
     
     public function getACCTTypes(){
         return $this->ACCT;
+    }
+
+    public function getDefaultACCTTypes(){
+        return $this->accounttypes;
     }
     
     public function getNormal(){

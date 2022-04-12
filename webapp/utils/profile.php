@@ -1118,6 +1118,7 @@ class profile
                         {
                             //remove liked action
                             $this->sessiondb->execute_no_return("DELETE FROM matches WHERE userdbid='$userdbid' AND matchdbid='$matchuserdbid'");
+                            $this->sessiondb->execute_no_return("DELETE FROM notifications WHERE userdbid='$userdbid' AND matchdbid='$matchuserdbid'");
                             $this->updateusersessionaction($userdbid, $token, $this->defaults->getActionType()[10], $lastseencoords);
                             $this->response['response'] = true;
 
@@ -1144,7 +1145,7 @@ class profile
         return json_encode($this->response, 1);
     }
     
-         public function UnMatch($userid, $matchuserdbid, $lastseencoords, $token){
+    public function UnMatch($userid, $matchuserdbid, $lastseencoords, $token){
         
         //check if match table exist
                 if($this->sessiondb->execute_count_table_no_return("matches") == 0)
@@ -1408,8 +1409,9 @@ class profile
     }
     
     
-     public function loadAvailableGiftItems($userid, $lastseencoords, $token){
+     public function loadAvailableGiftItems($userid, $coords, $token){
 
+        
                 if($this->sessiondb->execute_count_table_no_return("giftpayments") == 0)
                 {
                     $tablequery = "
@@ -1427,21 +1429,33 @@ class profile
                 
                //get userdbid
                $userdbid = $this->sessiondb->execute_return("SELECT id FROM users WHERE username='$userid'")[0]['id']; 
-
-               $giftitems = $this->sessiondb->execute_return("SELECT identifier, ext FROM gifts WHERE 1"); 
+                
+               $giftitems = $this->sessiondb->execute_return("SELECT identifier, accttype, amount, ext FROM gifts WHERE 1"); 
+               
                 if(is_array($giftitems) == true && count($giftitems) > 0)
                 {
-                    $this->response['data'] = $giftitems;
+                    //add key to gotten result
+                    foreach ($giftitems as $giftItem => $value){
+                        $newGiftItems[$giftItem]['key'] = $giftItem;
+                        $newGiftItems[$giftItem]['identifier'] = $value['identifier'];
+                        $newGiftItems[$giftItem]['accttype'] = $this->defaults->getDefaultACCTTypes()[(int)$value['accttype']];
+                        $newGiftItems[$giftItem]['amount'] = $value['amount'];
+                        $newGiftItems[$giftItem]['ext'] = $value['ext'];
+                    }
+                    $this->response['data'] = $newGiftItems;
+                    $this->response['response'] = true;
+                    $this->response['message'] = "Gift items are available for your view";
                 }
                 else
                 {
                     $this->response['data'] = [];
+                    $this->response['response'] = "error-no-load-gift-item-available";
+                    $this->response['message'] = "Gift items are unavailable for your view";
                 }
-        $this->updateusersessionaction($userdbid, $token, $this->defaults->getActionType()[9], $lastseencoords);        
-        $this->response['response'] = "success";
-        $this->response['message'] = "The selected gift item is unavailable for your view";
+        $this->updateusersessionaction($userdbid, $token, $this->defaults->getActionType()[9], $coords);        
+        
                
-        return $this->response;
+        return json_encode($this->response);
     }
     
     

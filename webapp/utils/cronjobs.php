@@ -65,8 +65,6 @@ if(is_array($notificationQuery) && count($notificationQuery) > 0)
                             $expo->notify([$channelName], $notificationPayLoad);
                             
                         }
-                    else
-                        $logger->log(dirname(  __FILE__)."/../../logs/".$logid, "Notification successfully sent");
                 })
                 ->catch(function ($exception) use($logger, $logid, $channelName, $notificationPayLoad, $notificationID) {
                     // When an exception is thrown from within a process, it's caught and passed here.
@@ -81,7 +79,6 @@ if(is_array($notificationQuery) && count($notificationQuery) > 0)
                     
                 });
 
-            $mypool->wait();
             
         }
     }

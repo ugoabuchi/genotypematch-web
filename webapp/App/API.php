@@ -324,6 +324,21 @@
                               }
                               
                           }
+                          else if($_POST['action'] == $defaultRegex->getActions()[7])
+                          {
+                              if(isset($_POST['coords']) && $_POST['coords'] != null)
+                              {
+                                $coords = $_POST['coords'];
+                                die($currentprofile->loadAvailableGiftItems($userid, $coords, $token));
+                              }
+                              else
+                              {
+                                    $response["response"] = "error-invalid-gift-loading-request-params";
+                                    $response["message"] = "Invalid criterias for performing load GIFT request, action dismissed";
+                                    die(json_encode($response, 1));
+                              }
+                              
+                          }
                           else if($_POST['action'] == "updatemarried")
                           {
                               if(isset($_POST['married']) && $_POST['married'] != null)
